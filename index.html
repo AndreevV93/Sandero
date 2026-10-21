@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Книжка Stepway</title>
+  <meta name="description" content="Сервисная книжка Renault Sandero Stepway II 2018. Один файл для GitHub Pages." />
+  <meta name="theme-color" content="#1e4638" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231e4638'/%3E%3Crect x='8' y='6' width='16' height='20' rx='2' fill='%23f3eee4'/%3E%3Crect x='8' y='6' width='4' height='20' fill='%238a4516'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,640&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f3eee4;
+      --sheet: #fbf8f2;
+      --ink: #1c1915;
+      --muted: #6e665c;
+      --line: #e3d9c9;
+      --pine: #1e4638;
+      --pine-fg: #f4f0e6;
+      --copper: #8a4516;
+      --copper-soft: #f3e2d2;
+      --danger: #8e2f2a;
+      --danger-soft: #f6e4e1;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--paper); color: var(--ink); }
+    body {
+      font-family: Manrope, ui-sans-serif, system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: 0.6; cursor: default; }
+    .wrap { max-width: 48rem; margin: 0 auto; padding: 1.5rem 1rem 6.5rem; }
+    .mast { border-left: 4px solid var(--pine); padding-left: 1rem; }
+    .kicker { margin: 0; color: var(--copper); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; }
+    h1, h2, .odo-num { font-family: Fraunces, ui-serif, Georgia, serif; font-weight: 560; }
+    h1 { margin: 0.15rem 0 0; font-size: 2.4rem; line-height: 1; }
+    h2 { margin: 0; font-size: 1.6rem; line-height: 1.15; }
+    .sub { margin: 0.45rem 0 0; color: var(--muted); font-size: 0.9rem; }
+    nav.tabs {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      background: var(--sheet); border-top: 1px solid var(--line);
+    }
+    nav.tabs button {
+      min-height: 3.5rem; border: 0; background: transparent; color: var(--muted);
+      font-size: 0.75rem; font-weight: 700;
+    }
+    nav.tabs button.on { color: var(--pine); }
+    @media (min-width: 768px) {
+      .wrap { padding-bottom: 2.5rem; }
+      nav.tabs { position: static; margin-top: 1.25rem; border-top: 0; border-bottom: 1px solid var(--line); background: transparent; }
+      nav.tabs button { font-size: 0.95rem; }
+    }
+    .card { background: var(--sheet); border: 1px solid var(--line); border-radius: 0.85rem; padding: 1.15rem; }
+    .row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 0.8rem; }
+    .odo-num { margin: 0; font-size: 3rem; line-height: 1; font-variant-numeric: tabular-nums; }
+    .odo-num span, .muted { color: var(--muted); font-family: Manrope, sans-serif; font-size: 1rem; font-weight: 500; }
+    .btn {
+      min-height: 2.75rem; border-radius: 0.6rem; border: 1px solid var(--line);
+      background: var(--sheet); color: var(--ink); padding: 0 0.9rem; font-weight: 700; font-size: 0.9rem;
+    }
+    .btn.primary { background: var(--pine); color: var(--pine-fg); border-color: var(--pine); }
+    .btn.danger { color: var(--danger); border: 0; background: transparent; padding-left: 0; }
+    .btn.link { border: 0; background: transparent; color: var(--pine); padding: 0; }
+    .stack { display: grid; gap: 0.75rem; }
+    .split { display: grid; gap: 0.75rem; }
+    @media (min-width: 640px) { .split { grid-template-columns: 1fr 1fr; } }
+    .list { list-style: none; margin: 0.6rem 0 0; padding: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .list li { padding: 0.75rem 0; border-bottom: 1px solid var(--line); }
+    .list li:last-child { border-bottom: 0; }
+    .item-btn { width: 100%; display: flex; justify-content: space-between; gap: 0.75rem; text-align: left; background: none; border: 0; padding: 0; }
+    .pill { flex: none; border-radius: 999px; padding: 0.2rem 0.6rem; font-size: 0.75rem; font-weight: 700; }
+    .overdue { background: var(--danger-soft); color: var(--danger); }
+    .soon { background: var(--copper-soft); color: var(--copper); }
+    .ok { border: 1px solid var(--line); color: var(--pine); }
+    .unknown { border: 1px solid var(--line); color: var(--muted); }
+    .group { margin: 0.4rem 0; color: var(--muted); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+    label { display: block; font-size: 0.9rem; font-weight: 700; }
+    input, select, textarea {
+      width: 100%; margin-top: 0.25rem; background: var(--paper); border: 1px solid var(--line);
+      border-radius: 0.6rem; padding: 0.7rem 0.75rem; outline: none;
+    }
+    textarea { min-height: 4.2rem; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--pine); }
+    .choice { width: 100%; text-align: left; background: var(--sheet); border: 1px solid var(--line); border-radius: 0.85rem; padding: 0.75rem 0.9rem; }
+    .choice.on { border-color: var(--pine); }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .check { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.35rem 0; font-weight: 500; }
+    .check input { width: 1.15rem; height: 1.15rem; margin-top: 0.2rem; accent-color: var(--pine); }
+    .sheet-back { position: fixed; inset: 0; z-index: 40; background: rgba(28, 25, 21, 0.4); display: flex; align-items: flex-end; justify-content: center; }
+    .sheet { width: min(100%, 34rem); max-height: 92vh; overflow: auto; background: var(--sheet); border-radius: 1rem 1rem 0 0; padding: 1rem 1rem 1.4rem; }
+    @media (min-width: 768px) {
+      .sheet-back { align-items: center; padding: 1.5rem; }
+      .sheet { border-radius: 0.9rem; }
+    }
+    .err { color: var(--danger); font-size: 0.9rem; }
+    .hide { display: none; }
+    .notice { margin: 0 0 1rem; }
+    a { color: var(--pine); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="mast">
+      <p class="kicker">RENAULT · DACIA</p>
+      <h1>Stepway II</h1>
+      <p class="sub" id="subtitle"></p>
+    </header>
+    <nav class="tabs" aria-label="Разделы">
+      <button type="button" data-act="tab" data-tab="home">Обзор</button>
+      <button type="button" data-act="tab" data-tab="log">Журнал</button>
+      <button type="button" data-act="tab" data-tab="plan">Регламент</button>
+      <button type="button" data-act="tab" data-tab="settings">Настройки</button>
+    </nav>
+    <main id="app" style="margin-top:1.25rem"></main>
+  </div>
+  <div id="modal"></div>
+  <script>
+    const KEY = "sandero-book-v1";
+    const ENGINES = [
+      { id: "k7m", label: "K7M · 1.6 8 кл. · 82 л.с.", short: "K7M 82", blurb: "Ремень ГРМ, без гидрокомпенсаторов, масло 3,4 л. Частый мотор версии без кондиционера." },
+      { id: "k4m", label: "K4M · 1.6 16 кл. · 102 л.с.", short: "K4M 102", blurb: "Ремень ГРМ, гидрокомпенсаторы есть, масло 4,8 л." },
+      { id: "h4m", label: "H4M · 1.6 16 кл. · 113 л.с.", short: "H4M 113", blurb: "Цепь ГРМ, без гидрокомпенсаторов, масло 4,8 л. Цепь планово не меняют." }
+    ];
+    const GEARBOXES = [
+      { id: "mt", label: "МКПП" },
+      { id: "at", label: "АКПП DP2" },
+      { id: "cvt", label: "Вариатор" }
+    ];
+    const CATS = ["Двигатель", "Трансмиссия", "Подвеска и рулевое", "Тормоза", "Электрика", "Кузов и салон", "Шины и диски", "Прочее"];
+    const GROUPS = ["Двигатель", "Фильтры", "Жидкости", "ГРМ и привод", "Тормоза", "Трансмиссия", "Осмотр"];
+    const ITEMS = [
+      { id: "oil", title: "Моторное масло", group: "Двигатель", km: 15000, months: 12, severe: true, detail: "15 000 км или 1 год. RN0700/RN0710, 5W-30 или 5W-40. K7M — 3,4 л; K4M и H4M — 4,8 л. В тяжёлых условиях — 7 500 км или 6 месяцев." },
+      { id: "oil-filter", title: "Масляный фильтр", group: "Фильтры", km: 15000, months: 12, severe: true, detail: "Вместе с маслом. K7M и K4M — 7700274177. H4M — 152085758R." },
+      { id: "drain-washer", title: "Прокладка сливной пробки", group: "Двигатель", km: 15000, months: 12, severe: true, detail: "Одноразовая при каждой замене масла. K7M и K4M — 110265505R. H4M — 1102601M02." },
+      { id: "air-filter", title: "Воздушный фильтр", group: "Фильтры", km: 15000, months: 12, severe: true, detail: "15 000 км или 1 год. K7M — 165469466R. K4M — 8200431051. H4M — 165460509R." },
+      { id: "cabin-filter", title: "Салонный фильтр", group: "Фильтры", km: 15000, months: 12, severe: true, cabin: true, detail: "15 000 км или 1 год, 272773277R. Без климата его часто нет — включите в настройках, только если стоит." },
+      { id: "spark-plugs", title: "Свечи зажигания", group: "Двигатель", km: 30000, months: 24, detail: "30 000 км или 2 года, 4 шт. K7M — 7700500168. K4M — 7700500155. H4M — 224019372R (на Sandero тоже 30 000 км)." },
+      { id: "brake-fluid", title: "Тормозная жидкость", group: "Жидкости", km: 90000, months: 36, detail: "90 000 км или 3 года. DOT 4+, около 0,7 л. Срок обычно важнее пробега." },
+      { id: "coolant", title: "Охлаждающая жидкость", group: "Жидкости", km: 90000, months: 72, detail: "90 000 км или 6 лет. Glaceol RX Type D, жёлтая, около 5,45 л. Не смешивать с другими типами." },
+      { id: "timing-belt", title: "Ремень ГРМ с роликами", group: "ГРМ и привод", km: 90000, months: 48, engines: ["k7m", "k4m"], detail: "С 2015 года, включая 2018: 90 000 км или 4 года. Ролики вместе с ремнём. Обрыв на K7M и K4M гнёт клапаны. Помпу часто меняют сразу." },
+      { id: "timing-chain", title: "Контроль цепи ГРМ", group: "ГРМ и привод", km: 15000, months: 12, engines: ["h4m"], detail: "У H4M цепь планово не меняют. На каждом ТО слушают холодный пуск. Замена только при шуме или растяжении." },
+      { id: "aux-belt", title: "Ремень генератора с роликами", group: "ГРМ и привод", km: 90000, months: 48, detail: "С 2015 года: 90 000 км или 4 года. Без кондиционера компрессора нет, интервал тот же." },
+      { id: "valve-k7m", title: "Регулировка зазоров клапанов", group: "Двигатель", km: 60000, months: null, engines: ["k7m"], detail: "K7M без гидрокомпенсаторов: каждые 60 000 км." },
+      { id: "valve-h4m", title: "Проверка зазоров клапанов", group: "Двигатель", km: 100000, months: null, engines: ["h4m"], detail: "H4M: проверка около 100 000 км, регулировка толкателями." },
+      { id: "rear-brakes-clean", title: "Очистка задних барабанов", group: "Тормоза", km: 60000, months: null, detail: "По карте Renault для задних барабанов: очистка пыли каждые 60 000 км." },
+      { id: "gearbox-mt", title: "Масло МКПП", group: "Трансмиссия", km: 90000, months: null, gears: ["mt"], rec: true, detail: "Завод часто пишет «на весь срок». JR5, около 2,5 л, GL-4 75W-80. Разумно около 90 000 км." },
+      { id: "gearbox-at", title: "Масло АКПП", group: "Трансмиссия", km: 60000, months: null, gears: ["at"], rec: true, detail: "DP2, MATIC D3. Частичная замена около 4 л каждые 60 000 км." },
+      { id: "gearbox-cvt", title: "Масло вариатора", group: "Трансмиссия", km: 40000, months: null, gears: ["cvt"], rec: true, detail: "CVTF, ориентир около 40 000 км." },
+      { id: "inspect-brakes", title: "Осмотр тормозов", group: "Осмотр", km: 15000, months: 12, detail: "Колодки, диски, барабаны, шланги. Износ колодок отмечайте как ремонт, не как срок." },
+      { id: "inspect-suspension", title: "Подвеска, рулевое, пыльники", group: "Осмотр", km: 15000, months: 12, detail: "Сайлентблоки, шаровые, стойки, пыльники ШРУС, люфт рулевого." },
+      { id: "inspect-fluids", title: "Уровни жидкостей", group: "Осмотр", km: 15000, months: 12, detail: "Масло, антифриз, тормозная, омыватель. ГУР на Stepway 2018 электрический." },
+      { id: "inspect-battery", title: "Аккумулятор и клеммы", group: "Осмотр", km: 15000, months: 12, detail: "Клеммы и заряд. Саму батарею на 4–6 году пишите как ремонт." },
+      { id: "inspect-tires", title: "Шины и давление", group: "Осмотр", km: 15000, months: 12, detail: "Давление по табличке на стойке, протектор, возраст 5–6 сезонов." },
+      { id: "inspect-lights", title: "Свет и стеклоочистители", group: "Осмотр", km: 15000, months: 12, detail: "Фары, стопы, повороты, номер, щётки, омыватель." },
+      { id: "inspect-exhaust", title: "Выпуск и днище", group: "Осмотр", km: 15000, months: 12, detail: "Глушитель, гофра, коррозия днища и тормозных трубок." }
+    ];
+    const PRESETS = [
+      { id: "oil", title: "Масло и фильтр", ids: ["oil", "oil-filter", "drain-washer"] },
+      { id: "to15", title: "Базовое ТО", ids: ["oil", "oil-filter", "drain-washer", "air-filter", "cabin-filter", "inspect-brakes", "inspect-suspension", "inspect-fluids", "inspect-battery", "inspect-tires", "inspect-lights", "inspect-exhaust"] },
+      { id: "plugs", title: "Свечи", ids: ["spark-plugs"] },
+      { id: "timing", title: "ГРМ и ремень", ids: ["timing-belt", "timing-chain", "aux-belt"] },
+      { id: "fluids", title: "Жидкости", ids: ["brake-fluid", "coolant"] }
+    ];
+    const defaults = { engine: "k7m", gearbox: "mt", severe: false, hasCabinFilter: false, warnKm: 2000, warnDays: 30, plate: "", vin: "", jsonbinMasterKey: "", jsonbinBinId: "" };
+    let state = load();
+    let tab = "home";
+    let notice = "";
+    let planQuery = "";
+
+    function load() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(KEY) || "null");
+        return sanitize(raw) || fresh();
+      } catch { return fresh(); }
+    }
+    function fresh() { return { settings: { ...defaults }, logs: [], readings: [] }; }
+    function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+    function uid() { return (crypto.randomUUID && crypto.randomUUID()) || ("id-" + Date.now()); }
+    function today() {
+      const d = new Date();
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+    function parseDate(iso) { const [y, m, d] = iso.split("-").map(Number); return new Date(y, (m || 1) - 1, d || 1, 12); }
+    function iso(date) { return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0"); }
+    function addMonths(value, months) {
+      const date = parseDate(value); const day = date.getDate();
+      date.setDate(1); date.setMonth(date.getMonth() + months);
+      const last = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+      date.setDate(Math.min(day, last)); return iso(date);
+    }
+    function addDays(value, days) { const date = parseDate(value); date.setDate(date.getDate() + days); return iso(date); }
+    function daysBetween(a, b) { return Math.round((parseDate(b) - parseDate(a)) / 86400000); }
+    function fmtKm(n) { return new Intl.NumberFormat("ru-RU").format(Math.round(n)); }
+    function fmtDate(value) { return value ? new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", year: "numeric" }).format(parseDate(value)) : "—"; }
+    function fmtMoney(n) { return new Intl.NumberFormat("ru-RU", { style: "currency", currency: "RUB", maximumFractionDigits: 0 }).format(n); }
+    function esc(s) { return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" }[c])); }
+    function num(v) { const n = Number(String(v).replace(/\s/g, "").replace(",", ".")); return Number.isFinite(n) ? n : null; }
+    function applies(item) {
+      const s = state.settings;
+      if (item.cabin && !s.hasCabinFilter) return false;
+      if (item.engines && !item.engines.includes(s.engine)) return false;
+      if (item.gears && !item.gears.includes(s.gearbox)) return false;
+      return true;
+    }
+    function applicable() { return ITEMS.filter(applies); }
+    function spanOf(item) {
+      let km = item.km, months = item.months;
+      if (state.settings.severe && item.severe) {
+        if (km) km = Math.round(km / 2);
+        if (months) months = Math.max(1, Math.round(months / 2));
+      }
+      return { km, months };
+    }
+    function currentKm() {
+      const all = state.readings.map((r) => r.km).concat(state.logs.map((l) => l.km));
+      return all.length ? Math.max(...all) : null;
+    }
+    function rate() {
+      const pts = state.readings.map((r) => ({ date: r.date, km: r.km })).concat(state.logs.map((l) => ({ date: l.date, km: l.km }))).filter((p) => p.date).sort((a, b) => a.date.localeCompare(b.date) || a.km - b.km);
+      if (pts.length < 2) return null;
+      const days = daysBetween(pts[0].date, pts[pts.length - 1].date);
+      const delta = pts[pts.length - 1].km - pts[0].km;
+      if (days < 7 || delta <= 0) return null;
+      return delta / days;
+    }
+    function lastLog(id) {
+      const hits = state.logs.filter((l) => l.kind === "scheduled" && (l.itemIds || []).includes(id));
+      hits.sort((a, b) => b.date.localeCompare(a.date) || b.km - a.km);
+      return hits[0] || null;
+    }
+    function statusFor(item) {
+      const span = spanOf(item);
+      const last = lastLog(item.id);
+      const odo = currentKm();
+      const now = today();
+      const row = { item, urgency: "unknown", last, kmLeft: null, daysLeft: null, dueDate: null, eta: null, span };
+      if (!last) return row;
+      if (span.km != null && odo != null) row.kmLeft = span.km - Math.max(0, odo - last.km);
+      if (span.months != null) { row.dueDate = addMonths(last.date, span.months); row.daysLeft = daysBetween(now, row.dueDate); }
+      const warnKm = Math.max(100, state.settings.warnKm || 0);
+      const warnDays = Math.max(1, state.settings.warnDays || 0);
+      const kmBad = row.kmLeft != null && row.kmLeft <= 0;
+      const timeBad = row.daysLeft != null && row.daysLeft <= 0;
+      const kmSoon = row.kmLeft != null && row.kmLeft > 0 && row.kmLeft <= warnKm;
+      const timeSoon = row.daysLeft != null && row.daysLeft > 0 && row.daysLeft <= warnDays;
+      row.urgency = kmBad || timeBad ? "overdue" : kmSoon || timeSoon ? "soon" : "ok";
+      const perDay = rate();
+      if (perDay && row.kmLeft > 0) row.eta = addDays(now, Math.round(row.kmLeft / perDay));
+      return row;
+    }
+    function statuses() {
+      return applicable().map(statusFor).sort((a, b) => rank(a) - rank(b));
+    }
+    function rank(s) {
+      const bias = s.urgency === "overdue" ? 0 : s.urgency === "soon" ? 1 : s.urgency === "ok" ? 2 : 3;
+      const ratios = [];
+      if (s.kmLeft != null && s.span.km) ratios.push(s.kmLeft / s.span.km);
+      if (s.daysLeft != null && s.span.months) ratios.push(s.daysLeft / (s.span.months * 30.44));
+      return bias * 100 + (ratios.length ? Math.min(...ratios) : 99);
+    }
+    function intervalLabel(span) {
+      const parts = [];
+      if (span.km) parts.push(fmtKm(span.km) + " км");
+      if (span.months) {
+        if (span.months % 12 === 0) {
+          const y = span.months / 12;
+          parts.push(y === 1 ? "1 год" : y < 5 ? y + " года" : y + " лет");
+        } else parts.push(span.months + " мес.");
+      }
+      return parts.join(" или ") || "по состоянию";
+    }
+    function remain(s) {
+      if (s.urgency === "unknown") return "Нет отметки — книжка не знает, когда делали";
+      const bits = [];
+      if (s.kmLeft != null) bits.push(s.kmLeft <= 0 ? "пробег просрочен на " + fmtKm(Math.abs(s.kmLeft)) + " км" : "ещё " + fmtKm(s.kmLeft) + " км");
+      if (s.daysLeft != null) bits.push(s.daysLeft <= 0 ? "срок вышел " + Math.abs(s.daysLeft) + " дн. назад" : s.daysLeft < 60 ? "ещё " + s.daysLeft + " дн." : "до " + fmtDate(s.dueDate));
+      return bits.join(" · ");
+    }
+    function pill(u) {
+      const text = { overdue: "Просрочено", soon: "Скоро", ok: "В норме", unknown: "Нет отметки" }[u];
+      return '<span class="pill ' + u + '">' + text + "</span>";
+    }
+    function engine() { return ENGINES.find((e) => e.id === state.settings.engine) || ENGINES[0]; }
+    function sanitize(raw) {
+      if (!raw || typeof raw !== "object") return null;
+      const payload = raw.state && typeof raw.state === "object" ? raw.state : raw;
+      const s = payload.settings && typeof payload.settings === "object" ? payload.settings : {};
+      const settings = {
+        ...defaults,
+        engine: ["k7m", "k4m", "h4m"].includes(s.engine) ? s.engine : "k7m",
+        gearbox: ["mt", "at", "cvt"].includes(s.gearbox) ? s.gearbox : "mt",
+        severe: !!s.severe,
+        hasCabinFilter: !!s.hasCabinFilter,
+        warnKm: Math.max(0, Math.round(Number(s.warnKm) || defaults.warnKm)),
+        warnDays: Math.max(0, Math.round(Number(s.warnDays) || defaults.warnDays)),
+        plate: typeof s.plate === "string" ? s.plate : "",
+        vin: typeof s.vin === "string" ? s.vin : "",
+        jsonbinMasterKey: typeof s.jsonbinMasterKey === "string" ? s.jsonbinMasterKey : "",
+        jsonbinBinId: typeof s.jsonbinBinId === "string" ? s.jsonbinBinId : ""
+      };
+      const logs = [];
+      (Array.isArray(payload.logs) ? payload.logs : []).forEach((row) => {
+        if (!row || !/^\d{4}-\d{2}-\d{2}$/.test(row.date) || !Number.isFinite(Number(row.km))) return;
+        logs.push({
+          id: row.id || uid(), kind: row.kind === "repair" ? "repair" : "scheduled",
+          itemIds: Array.isArray(row.itemIds) ? row.itemIds.filter((id) => typeof id === "string") : [],
+          title: row.title || "Работа", category: row.category || "", date: row.date, km: Math.round(Number(row.km)),
+          cost: Number.isFinite(Number(row.cost)) ? Math.round(Number(row.cost)) : null, shop: row.shop || "", note: row.note || ""
+        });
+      });
+      const readings = [];
+      (Array.isArray(payload.readings) ? payload.readings : []).forEach((row) => {
+        if (!row || !/^\d{4}-\d{2}-\d{2}$/.test(row.date) || !Number.isFinite(Number(row.km))) return;
+        readings.push({ id: row.id || uid(), date: row.date, km: Math.round(Number(row.km)), note: row.note || "" });
+      });
+      return { settings, logs, readings };
+    }
+    function exportDoc() {
+      const copy = JSON.parse(JSON.stringify(state));
+      copy.settings.jsonbinMasterKey = "";
+      return { app: "sandero-stepway-service", version: 1, exportedAt: new Date().toISOString(), state: copy };
+    }
+    function render() {
+      const eng = engine();
+      document.getElementById("subtitle").textContent = "2018 · без кондиционера · " + eng.short + (state.settings.plate ? " · " + state.settings.plate : "") + (state.settings.severe ? " · тяжёлые условия" : "") + " · файл для GitHub Pages";
+      document.querySelectorAll("nav.tabs button").forEach((btn) => btn.classList.toggle("on", btn.dataset.tab === tab));
+      const root = document.getElementById("app");
+      const note = notice ? '<p class="card notice">' + esc(notice) + "</p>" : "";
+      root.innerHTML = note + (tab === "home" ? viewHome() : tab === "log" ? viewLog() : tab === "plan" ? viewPlan() : viewSettings());
+    }
+    function viewHome() {
+      const odo = currentKm();
+      const per = rate();
+      const rows = statuses();
+      const attention = rows.filter((r) => r.urgency === "overdue" || r.urgency === "soon");
+      const unknown = rows.filter((r) => r.urgency === "unknown").length;
+      const next = rows.find((r) => r.urgency === "ok");
+      let body;
+      if (attention.length) {
+        body = '<ul class="list">' + attention.map((r) => '<li><button class="item-btn" data-act="mark" data-id="' + r.item.id + '"><span><strong>' + esc(r.item.title) + '</strong><span class="muted" style="display:block">' + esc(remain(r)) + (r.eta && r.kmLeft > 0 ? " По темпу около " + esc(fmtDate(r.eta)) + "." : "") + "</span></span>" + pill(r.urgency) + "</button></li>").join("") + "</ul>";
+      } else {
+        body = '<div class="card" style="margin-top:.75rem"><strong>' + (unknown ? "Срочных работ пока не видно" : next ? "Ближайшее в норме: " + esc(next.item.title) : "Проверьте двигатель") + '</strong><p class="muted">' + (unknown ? unknown + " работ без отметки. Срок считается от записанного визита, не от 2018 года." : next ? esc(remain(next)) : "") + "</p></div>";
+      }
+      return '<section class="card"><div class="row"><div><p class="muted" style="margin:0">Одометр</p><p class="odo-num">' + (odo == null ? "—" : fmtKm(odo)) + ' <span>км</span></p><p class="muted">' + (per ? "Около " + fmtKm(per * 30) + " км в месяц." : "Две отметки пробега в разные дни дадут прогноз даты.") + '</p></div><button class="btn primary" data-act="odo">Обновить пробег</button></div></section>'
+        + '<section style="margin-top:1.4rem"><div class="row"><h2>Ближайшие работы</h2><button class="btn link" data-act="service">Внести ТО</button></div>' + body + '</section>'
+        + '<div class="split" style="margin-top:1rem"><button class="card" data-act="service" style="text-align:left"><span class="muted">По регламенту</span><br><strong>Отметить работы из списка</strong></button><button class="card" data-act="repair" style="text-align:left"><span class="muted">Не по книжке</span><br><strong>Внеплановый ремонт</strong></button></div>';
+    }
+    function viewLog() {
+      const spent = state.logs.reduce((s, l) => s + (l.cost || 0), 0);
+      const rows = state.logs.map((log) => ({ kind: "log", date: log.date, km: log.km, log })).concat(state.readings.map((reading) => ({ kind: "reading", date: reading.date, km: reading.km, reading }))).sort((a, b) => b.date.localeCompare(a.date) || b.km - a.km);
+      const list = rows.length ? '<ul class="list">' + rows.map((row) => {
+        if (row.kind === "reading") {
+          return '<li><p class="group">Пробег</p><strong>' + fmtKm(row.reading.km) + ' км</strong><p class="muted">' + fmtDate(row.reading.date) + (row.reading.note ? " · " + esc(row.reading.note) : "") + '</p><button class="btn danger" data-act="del-read" data-id="' + esc(row.reading.id) + '">Удалить</button></li>';
+        }
+        return '<li><p class="group">' + (row.log.kind === "repair" ? "Ремонт" + (row.log.category ? " · " + esc(row.log.category) : "") : "Регламент") + "</p><strong>" + esc(row.log.title) + '</strong><p class="muted">' + fmtDate(row.log.date) + " · " + fmtKm(row.log.km) + " км" + (row.log.cost != null ? " · " + fmtMoney(row.log.cost) : "") + (row.log.shop ? " · " + esc(row.log.shop) : "") + "</p>" + (row.log.note ? "<p>" + esc(row.log.note) + "</p>" : "") + '<button class="btn link" data-act="edit" data-id="' + esc(row.log.id) + '">Править</button> <button class="btn danger" data-act="del-log" data-id="' + esc(row.log.id) + '">Удалить</button></li>';
+      }).join("") + "</ul>" : '<p class="muted">Пока пусто. Отметьте последнее масло — даже если делали его раньше.</p>';
+      return '<div class="row"><div><h2>Журнал</h2><p class="muted">' + rows.length + " записей" + (spent ? " · " + fmtMoney(spent) : "") + '</p></div><div><button class="btn primary" data-act="service">ТО</button> <button class="btn" data-act="repair">Ремонт</button></div></div>' + list;
+    }
+    function viewPlan() {
+      const rows = statuses();
+      let html = '<h2>Регламент 2018</h2><p class="muted">Stepway II с 2015 года: ТО каждые 15 000 км или 12 месяцев. Ремень ГРМ у K7M и K4M — 90 000 км или 4 года, что раньше. Сводка открытых карт Renault, не замена официальной книжки.</p><input id="q" placeholder="Найти в регламенте" aria-label="Найти в регламенте" value="' + esc(planQuery) + '" />';
+      const q = planQuery.trim().toLowerCase();
+      GROUPS.forEach((group) => {
+        const items = rows.filter((r) => r.item.group === group && (!q || (r.item.title + r.item.detail).toLowerCase().includes(q)));
+        if (!items.length) return;
+        html += '<h3 class="group" style="margin-top:1.3rem">' + group + '</h3><ul class="list">' + items.map((r) => '<li><div class="row"><div><strong>' + esc(r.item.title) + (r.item.rec ? ' <span class="pill soon">рекомендация</span>' : "") + '</strong><div style="color:var(--pine)">' + esc(intervalLabel(r.span)) + '</div></div>' + pill(r.urgency) + '</div><p class="muted">' + esc(r.item.detail) + "</p>" + (r.urgency !== "unknown" ? "<p>" + esc(remain(r)) + "</p>" : "") + '<button class="btn link" data-act="mark" data-id="' + r.item.id + '">Отметить выполнение</button></li>').join("") + "</ul>";
+      });
+      return html;
+    }
+    function viewSettings() {
+      const eng = engine();
+      return '<h2>Автомобиль</h2><p class="muted">Sandero Stepway II, 2018, без кондиционера. Код мотора на наклейке: K7M, K4M или H4M.</p><div class="stack" style="margin-top:.7rem">'
+        + ENGINES.map((e) => '<button class="choice' + (state.settings.engine === e.id ? " on" : "") + '" data-act="engine" data-id="' + e.id + '"><strong>' + esc(e.label) + '</strong><span class="muted" style="display:block">' + esc(e.blurb) + "</span></button>").join("")
+        + '</div><p class="muted">Сейчас в расчёте: ' + esc(eng.short) + '.</p><div class="chips" style="margin-top:.6rem">'
+        + GEARBOXES.map((g) => '<button class="btn' + (state.settings.gearbox === g.id ? " primary" : "") + '" data-act="gear" data-id="' + g.id + '">' + g.label + "</button>").join("")
+        + '</div><div class="split" style="margin-top:.8rem"><label>Госномер<input id="plate" value="' + esc(state.settings.plate) + '"></label><label>VIN<input id="vin" value="' + esc(state.settings.vin) + '"></label></div>'
+        + '<h2 style="margin-top:1.6rem">Как предупреждать</h2>'
+        + toggle("severe", "Тяжёлые условия", "Масло и фильтры вдвое чаще. Ремень и жидкости не укорачиваются.")
+        + toggle("hasCabinFilter", "Салонный фильтр установлен", "Без кондиционера его часто нет.")
+        + '<div class="split" style="margin-top:.8rem"><label>Предупреждать за, км<input id="warnKm" inputmode="numeric" value="' + esc(state.settings.warnKm) + '"></label><label>Предупреждать за, дней<input id="warnDays" inputmode="numeric" value="' + esc(state.settings.warnDays) + '"></label></div>'
+        + '<h2 style="margin-top:1.6rem">JSONBin</h2><p class="muted">Ключ X-Master-Key с jsonbin.io. Первая выгрузка создаст корзину. Ключ хранится только в этом браузере.</p>'
+        + '<label style="margin-top:.6rem">X-Master-Key<input id="binKey" type="password" autocomplete="off" value="' + esc(state.settings.jsonbinMasterKey) + '"></label>'
+        + '<label style="margin-top:.6rem">Bin ID<input id="binId" value="' + esc(state.settings.jsonbinBinId) + '" placeholder="появится после выгрузки"></label>'
+        + '<div class="chips" style="margin-top:.7rem"><button class="btn primary" data-act="push">Выгрузить в JSONBin</button><button class="btn" data-act="pull">Загрузить из JSONBin</button></div><p id="syncerr" class="err"></p>'
+        + '<h2 style="margin-top:1.6rem">Файл</h2><p class="muted">Этот index.html можно положить в репозиторий GitHub Pages. Он работает сам, без сборки. Данные совпадают с основной книжкой на том же сайте и переносятся JSON-файлом.</p>'
+        + '<div class="chips" style="margin-top:.7rem"><button class="btn" data-act="download">Скачать JSON</button><button class="btn" data-act="pick">Открыть JSON</button><input id="file" type="file" accept="application/json,.json" class="hide"></div>'
+        + '<button class="btn danger" data-act="reset" style="margin-top:1rem">Стереть записи на этом устройстве</button>';
+    }
+    function toggle(key, title, text) {
+      const on = !!state.settings[key];
+      return '<button class="choice" style="margin-top:.6rem" data-act="toggle" data-id="' + key + '"><strong>' + (on ? "Вкл · " : "Выкл · ") + esc(title) + '</strong><span class="muted" style="display:block">' + esc(text) + "</span></button>";
+    }
+    function openSheet(title, inner) {
+      document.getElementById("modal").innerHTML = '<div class="sheet-back"><div class="sheet" role="dialog" aria-modal="true"><div class="row"><h2>' + esc(title) + '</h2><button class="btn link" data-act="close">Закрыть</button></div>' + inner + "</div></div>";
+    }
+    function closeSheet() { document.getElementById("modal").innerHTML = ""; }
+    function formFields(entry) {
+      const odo = currentKm();
+      return '<div class="split"><label>Дата<input id="f-date" type="date" value="' + esc(entry ? entry.date : today()) + '"></label><label>Пробег, км<input id="f-km" inputmode="numeric" value="' + esc(entry ? entry.km : (odo ?? "")) + '"></label><label>Сумма, ₽<input id="f-cost" inputmode="decimal" value="' + esc(entry && entry.cost != null ? entry.cost : "") + '"></label><label>Где делали<input id="f-shop" value="' + esc(entry ? entry.shop : "") + '"></label></div><label style="margin-top:.6rem">Заметка<textarea id="f-note">' + esc(entry ? entry.note : "") + "</textarea></label><p id="ferr" class="err"></p>";
+    }
+    function readCommon() {
+      const date = document.getElementById("f-date").value;
+      const km = num(document.getElementById("f-km").value);
+      const costRaw = document.getElementById("f-cost").value.trim();
+      const cost = costRaw ? num(costRaw) : null;
+      if (!date) return { error: "Укажите дату." };
+      if (km == null || km < 0) return { error: "Нужен пробег." };
+      if (costRaw && (cost == null || cost < 0)) return { error: "Сумма должна быть числом." };
+      return { date, km: Math.round(km), cost: cost == null ? null : Math.round(cost), shop: document.getElementById("f-shop").value.trim(), note: document.getElementById("f-note").value.trim() };
+    }
+    let selected = [];
+    let editing = null;
+    function openService(preset, edit) {
+      editing = edit || null;
+      const allowed = new Set(applicable().map((i) => i.id));
+      selected = ((edit && edit.itemIds) || preset || []).filter((id) => allowed.has(id));
+      paintService();
+    }
+    function paintService() {
+      const allowed = applicable();
+      const chips = PRESETS.map((p) => '<button class="btn" data-act="preset" data-id="' + p.id + '">' + p.title + "</button>").join("");
+      const groups = GROUPS.map((group) => {
+        const items = allowed.filter((i) => i.group === group);
+        if (!items.length) return "";
+        return '<p class="group">' + group + "</p>" + items.map((item) => '<label class="check"><input type="checkbox" data-act="check" value="' + item.id + '"' + (selected.includes(item.id) ? " checked" : "") + "><span><strong>" + esc(item.title) + '</strong><span class="muted" style="display:block">' + esc(intervalLabel(spanOf(item))) + (item.rec ? " · рекомендация" : "") + "</span></span></label>").join("");
+      }).join("");
+      openSheet(editing ? "Править работу" : "Регламентная работа", '<p class="muted">Для уже сделанной работы поставьте дату и пробег того визита.</p><div class="chips" style="margin:.6rem 0">' + chips + '</div><input id="find" placeholder="Найти работу" aria-label="Найти работу"><div id="catalog">' + groups + '</div><p class="muted">Выбрано: ' + selected.length + "</p>" + formFields(editing) + '<button class="btn primary" style="width:100%;margin-top:.8rem" data-act="save-service">Сохранить в книжку</button>');
+      const find = document.getElementById("find");
+      if (find) find.addEventListener("input", () => {
+        const q = find.value.trim().toLowerCase();
+        document.querySelectorAll("#catalog .check").forEach((node) => {
+          const text = node.textContent.toLowerCase();
+          node.style.display = !q || text.includes(q) ? "" : "none";
+        });
+      });
+    }
+    function openRepair(edit) {
+      editing = edit || null;
+      const options = CATS.map((c) => '<option' + (edit && edit.category === c ? " selected" : "") + ">" + esc(c) + "</option>").join("");
+      openSheet(edit ? "Править ремонт" : "Внеплановый ремонт", '<p class="muted">Колодки, стойка, лампа, аккумулятор — всё, чего нет в регламенте.</p><label style="margin-top:.6rem">Что сделано<input id="f-title" value="' + esc(edit ? edit.title : "") + '"></label><label style="margin-top:.6rem">Раздел<select id="f-cat">' + options + "</select></label>" + formFields(edit) + '<button class="btn primary" style="width:100%;margin-top:.8rem" data-act="save-repair">Сохранить ремонт</button>');
+    }
+    function openOdo() {
+      const odo = currentKm();
+      openSheet("Пробег", '<label>Дата<input id="f-date" type="date" value="' + today() + '"></label><label style="margin-top:.6rem">Одометр, км<input id="f-km" inputmode="numeric" value="' + esc(odo ?? "") + '"></label><label style="margin-top:.6rem">Заметка<input id="f-note"></label><p id="ferr" class="err"></p><button class="btn primary" style="width:100%;margin-top:.8rem" data-act="save-odo">Записать пробег</button>');
+    }
+    function upsert(entry) {
+      const i = state.logs.findIndex((l) => l.id === entry.id);
+      if (i >= 0) state.logs[i] = entry; else state.logs.unshift(entry);
+      save(); closeSheet(); tab = "log"; notice = entry.kind === "repair" ? "Ремонт записан." : "Работа записана. Сроки пересчитаны."; render();
+    }
+    async function pushBin() {
+      const err = document.getElementById("syncerr");
+      const key = state.settings.jsonbinMasterKey.trim();
+      if (!key) { err.textContent = "Вставьте X-Master-Key."; return; }
+      const bin = state.settings.jsonbinBinId.trim();
+      const headers = { "Content-Type": "application/json", "X-Master-Key": key };
+      if (!bin) { headers["X-Bin-Name"] = "sandero-stepway-service"; headers["X-Bin-Private"] = "true"; }
+      try {
+        const res = await fetch(bin ? "https://api.jsonbin.io/v3/b/" + encodeURIComponent(bin) : "https://api.jsonbin.io/v3/b", { method: bin ? "PUT" : "POST", headers, body: JSON.stringify(exportDoc()) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || ("JSONBin " + res.status));
+        if (!bin && data.metadata && data.metadata.id) state.settings.jsonbinBinId = data.metadata.id;
+        save(); notice = "Книжка выгружена в JSONBin."; render();
+      } catch (e) { err.textContent = e.message || "Не удалось выгрузить."; }
+    }
+    async function pullBin() {
+      const err = document.getElementById("syncerr");
+      const key = state.settings.jsonbinMasterKey.trim();
+      const bin = state.settings.jsonbinBinId.trim();
+      if (!key || !bin) { err.textContent = "Нужны ключ и Bin ID."; return; }
+      try {
+        const res = await fetch("https://api.jsonbin.io/v3/b/" + encodeURIComponent(bin) + "/latest", { headers: { "X-Master-Key": key } });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || ("JSONBin " + res.status));
+        const parsed = sanitize(data.record || data);
+        if (!parsed) throw new Error("В корзине нет книжки Stepway.");
+        parsed.settings.jsonbinMasterKey = key;
+        parsed.settings.jsonbinBinId = bin;
+        state = parsed; save(); notice = "Записи загружены из JSONBin."; render();
+      } catch (e) { err.textContent = e.message || "Не удалось загрузить."; }
+    }
+    document.addEventListener("click", (event) => {
+      const node = event.target.closest("[data-act]");
+      if (!node) return;
+      const act = node.dataset.act;
+      const id = node.dataset.id;
+      if (act === "close") return closeSheet();
+      if (act === "tab") { tab = node.dataset.tab; notice = ""; render(); return; }
+      if (act === "odo") return openOdo();
+      if (act === "service") return openService([]);
+      if (act === "repair") return openRepair(null);
+      if (act === "mark") return openService([id]);
+      if (act === "preset") { selected = (PRESETS.find((p) => p.id === id).ids).filter((item) => applicable().some((row) => row.id === item)); paintService(); return; }
+      if (act === "save-service") {
+        const common = readCommon();
+        const ferr = document.getElementById("ferr");
+        if (!selected.length) { ferr.textContent = "Отметьте хотя бы одну работу."; return; }
+        if (common.error) { ferr.textContent = common.error; return; }
+        const titles = applicable().filter((item) => selected.includes(item.id)).map((item) => item.title);
+        upsert({ id: editing ? editing.id : uid(), kind: "scheduled", itemIds: selected.slice(), title: titles.join(", "), category: "", ...common });
+        return;
+      }
+      if (act === "save-repair") {
+        const common = readCommon();
+        const ferr = document.getElementById("ferr");
+        const title = document.getElementById("f-title").value.trim();
+        if (!title) { ferr.textContent = "Напишите, что ремонтировали."; return; }
+        if (common.error) { ferr.textContent = common.error; return; }
+        upsert({ id: editing ? editing.id : uid(), kind: "repair", itemIds: [], title, category: document.getElementById("f-cat").value, ...common });
+        return;
+      }
+      if (act === "save-odo") {
+        const date = document.getElementById("f-date").value;
+        const km = num(document.getElementById("f-km").value);
+        const ferr = document.getElementById("ferr");
+        if (!date || km == null || km < 0) { ferr.textContent = "Нужны дата и пробег."; return; }
+        state.readings.unshift({ id: uid(), date, km: Math.round(km), note: document.getElementById("f-note").value.trim() });
+        save(); closeSheet(); tab = "home"; notice = "Пробег обновлён."; render();
+        return;
+      }
+      if (act === "edit") {
+        const entry = state.logs.find((l) => l.id === id);
+        if (!entry) return;
+        return entry.kind === "repair" ? openRepair(entry) : openService(entry.itemIds, entry);
+      }
+      if (act === "del-log") { state.logs = state.logs.filter((l) => l.id !== id); save(); render(); return; }
+      if (act === "del-read") { state.readings = state.readings.filter((r) => r.id !== id); save(); render(); return; }
+      if (act === "engine") { state.settings.engine = id; save(); render(); return; }
+      if (act === "gear") { state.settings.gearbox = id; save(); render(); return; }
+      if (act === "toggle") { state.settings[id] = !state.settings[id]; save(); render(); return; }
+      if (act === "push") return pushBin();
+      if (act === "pull") return pullBin();
+      if (act === "download") {
+        const blob = new Blob([JSON.stringify(exportDoc(), null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob); const a = document.createElement("a");
+        a.href = url; a.download = "stepway-service.json"; a.click(); URL.revokeObjectURL(url); return;
+      }
+      if (act === "pick") { document.getElementById("file").click(); return; }
+      if (act === "reset") {
+        const key = state.settings.jsonbinMasterKey, bin = state.settings.jsonbinBinId;
+        state = fresh(); state.settings.jsonbinMasterKey = key; state.settings.jsonbinBinId = bin;
+        save(); notice = "Записи стёрты. Ключ JSONBin оставлен."; render();
+      }
+    });
+    document.addEventListener("change", (event) => {
+      const t = event.target;
+      if (t.dataset && t.dataset.act === "check") {
+        if (t.checked) selected.push(t.value); else selected = selected.filter((id) => id !== t.value);
+        const label = document.querySelector("#catalog") && document.querySelector(".sheet .muted");
+        const hint = document.querySelector(".sheet p.muted:last-of-type");
+        if (hint && hint.textContent.startsWith("Выбрано")) hint.textContent = "Выбрано: " + selected.length;
+        return;
+      }
+      if (t.id === "file" && t.files && t.files[0]) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = sanitize(JSON.parse(String(reader.result)));
+            if (!parsed) throw new Error("bad");
+            parsed.settings.jsonbinMasterKey = state.settings.jsonbinMasterKey || parsed.settings.jsonbinMasterKey;
+            parsed.settings.jsonbinBinId = parsed.settings.jsonbinBinId || state.settings.jsonbinBinId;
+            state = parsed; save(); notice = "Файл прочитан."; render();
+          } catch { notice = "Этот JSON не похож на книжку Stepway."; render(); }
+        };
+        reader.readAsText(t.files[0]);
+      }
+      const map = { plate: "plate", vin: "vin", warnKm: "warnKm", warnDays: "warnDays", binKey: "jsonbinMasterKey", binId: "jsonbinBinId" };
+      if (map[t.id]) {
+        let value = t.value;
+        if (t.id === "vin") value = value.toUpperCase();
+        if (t.id === "warnKm" || t.id === "warnDays") value = Math.max(0, Math.round(Number(value) || 0));
+        if (t.id === "binId") value = value.trim();
+        state.settings[map[t.id]] = value;
+        save();
+        if (t.id === "plate") {
+          const eng = engine();
+          document.getElementById("subtitle").textContent = "2018 · без кондиционера · " + eng.short + (value ? " · " + value : "") + (state.settings.severe ? " · тяжёлые условия" : "") + " · файл для GitHub Pages";
+        }
+      }
+    });
+    document.addEventListener("input", (event) => {
+      if (event.target.id !== "q") return;
+      planQuery = event.target.value;
+      const pos = event.target.selectionStart;
+      render();
+      const field = document.getElementById("q");
+      if (field) {
+        field.focus();
+        field.setSelectionRange(pos, pos);
+      }
+    });
+    document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeSheet(); });
+    render();
+  </script>
+</body>
+</html>
