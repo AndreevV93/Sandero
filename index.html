@@ -108,7 +108,7 @@
 <body>
   <div class="wrap">
     <header class="mast">
-      <p class="kicker">RENAULT · DACIA</p>
+      <p class="kicker">RENAULT</p>
       <h1>Stepway II</h1>
       <p class="sub" id="subtitle"></p>
     </header>
@@ -168,7 +168,7 @@
       { id: "timing", title: "ГРМ и ремень", ids: ["timing-belt", "timing-chain", "aux-belt"] },
       { id: "fluids", title: "Жидкости", ids: ["brake-fluid", "coolant"] }
     ];
-    const defaults = { engine: "k7m", gearbox: "mt", severe: false, hasCabinFilter: false, warnKm: 2000, warnDays: 30, plate: "", vin: "", jsonbinMasterKey: "", jsonbinBinId: "" };
+    const defaults = { engine: "k7m", gearbox: "mt", severe: false, hasCabinFilter: false, warnKm: 2000, warnDays: 30, plate: "", vin: "", jsonbinMasterKey: "", jsonbinBinId: "", ignoredIds: [] };
     let state = load();
     let tab = "home";
     let notice = "";
@@ -180,7 +180,7 @@
         return sanitize(raw) || fresh();
       } catch { return fresh(); }
     }
-    function fresh() { return { settings: { ...defaults }, logs: [], readings: [] }; }
+    function fresh() { return { settings: { ...defaults, ignoredIds: [] }, logs: [], readings: [] }; }
     function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
     function uid() { return (crypto.randomUUID && crypto.randomUUID()) || ("id-" + Date.now()); }
     function today() {
@@ -210,14 +210,15 @@
       });
     }
     function num(v) { const n = Number(String(v).replace(/\s/g, "").replace(",", ".")); return Number.isFinite(n) ? n : null; }
-    function applies(item) {
+    function fits(item) {
       const s = state.settings;
       if (item.cabin && !s.hasCabinFilter) return false;
       if (item.engines && !item.engines.includes(s.engine)) return false;
       if (item.gears && !item.gears.includes(s.gearbox)) return false;
       return true;
     }
-    function applicable() { return ITEMS.filter(applies); }
+    function ignoredSet() { return new Set(state.settings.ignoredIds || []); }
+    function applicable() { const skip = ignoredSet(); return ITEMS.filter((item) => fits(item) && !skip.has(item.id)); }
     function spanOf(item) {
       let km = item.km, months = item.months;
       if (state.settings.severe && item.severe) {
@@ -311,7 +312,8 @@
         plate: typeof s.plate === "string" ? s.plate : "",
         vin: typeof s.vin === "string" ? s.vin : "",
         jsonbinMasterKey: typeof s.jsonbinMasterKey === "string" ? s.jsonbinMasterKey : "",
-        jsonbinBinId: typeof s.jsonbinBinId === "string" ? s.jsonbinBinId : ""
+        jsonbinBinId: typeof s.jsonbinBinId === "string" ? s.jsonbinBinId : "",
+        ignoredIds: Array.isArray(s.ignoredIds) ? [...new Set(s.ignoredIds.filter((id) => typeof id === "string" && ITEMS.some((item) => item.id === id)))] : []
       };
       const logs = [];
       (Array.isArray(payload.logs) ? payload.logs : []).forEach((row) => {
@@ -372,13 +374,14 @@
       return '<div class="row"><div><h2>Журнал</h2><p class="muted">' + rows.length + " записей" + (spent ? " · " + fmtMoney(spent) : "") + '</p></div><div><button class="btn primary" data-act="service">ТО</button> <button class="btn" data-act="repair">Ремонт</button></div></div>' + list;
     }
     function viewPlan() {
-      const rows = statuses();
-      let html = '<h2>Регламент 2018</h2><p class="muted">Stepway II с 2015 года: ТО каждые 15 000 км или 12 месяцев. Ремень ГРМ у K7M и K4M — 90 000 км или 4 года, что раньше. Сводка открытых карт Renault, не замена официальной книжки.</p><input id="q" placeholder="Найти в регламенте" aria-label="Найти в регламенте" value="' + esc(planQuery) + '" />';
+      const skip = ignoredSet();
+      const rows = ITEMS.filter(fits).map((item) => Object.assign(statusFor(item), { ignored: skip.has(item.id) }));
+      let html = '<h2>Регламент 2018</h2><p class="muted">Ненужный пункт можно выключить — он пропадёт из напоминаний и из списка при записи ТО. Интервалы: 15 000 км или год, ремень ГРМ у K7M и K4M — 90 000 км или 4 года.</p><input id="q" placeholder="Найти в регламенте" aria-label="Найти в регламенте" value="' + esc(planQuery) + '" />';
       const q = planQuery.trim().toLowerCase();
       GROUPS.forEach((group) => {
         const items = rows.filter((r) => r.item.group === group && (!q || (r.item.title + r.item.detail).toLowerCase().includes(q)));
         if (!items.length) return;
-        html += '<h3 class="group" style="margin-top:1.3rem">' + group + '</h3><ul class="list">' + items.map((r) => '<li><div class="row"><div><strong>' + esc(r.item.title) + (r.item.rec ? ' <span class="pill soon">рекомендация</span>' : "") + '</strong><div style="color:var(--pine)">' + esc(intervalLabel(r.span)) + '</div></div>' + pill(r.urgency) + '</div><p class="muted">' + esc(r.item.detail) + "</p>" + (r.urgency !== "unknown" ? "<p>" + esc(remain(r)) + "</p>" : "") + '<button class="btn link" data-act="mark" data-id="' + r.item.id + '">Отметить выполнение</button></li>').join("") + "</ul>";
+        html += '<h3 class="group" style="margin-top:1.3rem">' + group + '</h3><ul class="list">' + items.map((r) => '<li style="' + (r.ignored ? "opacity:.6" : "") + '"><div class="row"><div><strong>' + esc(r.item.title) + (r.item.rec ? ' <span class="pill soon">рекомендация</span>' : "") + '</strong><div style="color:var(--pine)">' + esc(intervalLabel(r.span)) + '</div></div>' + (r.ignored ? '<span class="pill unknown">Не слежу</span>' : pill(r.urgency)) + '</div><p class="muted">' + esc(r.item.detail) + "</p>" + (!r.ignored && r.urgency !== "unknown" ? "<p>" + esc(remain(r)) + "</p>" : "") + (r.ignored ? "" : '<button class="btn link" data-act="mark" data-id="' + r.item.id + '">Отметить выполнение</button> ') + '<button class="btn link" data-act="ignore" data-id="' + r.item.id + '">' + (r.ignored ? "Снова отслеживать" : "Не отслеживать") + "</button></li>").join("") + "</ul>";
       });
       return html;
     }
@@ -505,6 +508,14 @@
       if (act === "service") return openService([]);
       if (act === "repair") return openRepair(null);
       if (act === "mark") return openService([id]);
+      if (act === "ignore") {
+        const list = new Set(state.settings.ignoredIds || []);
+        if (list.has(id)) list.delete(id); else list.add(id);
+        state.settings.ignoredIds = [...list];
+        save();
+        render();
+        return;
+      }
       if (act === "preset") { selected = (PRESETS.find((p) => p.id === id).ids).filter((item) => applicable().some((row) => row.id === item)); paintService(); return; }
       if (act === "save-service") {
         const common = readCommon();
