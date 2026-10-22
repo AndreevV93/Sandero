@@ -200,7 +200,15 @@
     function fmtKm(n) { return new Intl.NumberFormat("ru-RU").format(Math.round(n)); }
     function fmtDate(value) { return value ? new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", year: "numeric" }).format(parseDate(value)) : "—"; }
     function fmtMoney(n) { return new Intl.NumberFormat("ru-RU", { style: "currency", currency: "RUB", maximumFractionDigits: 0 }).format(n); }
-    function esc(s) { return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" }[c])); }
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (c) => {
+        if (c === "&") return "&" + "amp;";
+        if (c === "<") return "&" + "lt;";
+        if (c === ">") return "&" + "gt;";
+        if (c === '"') return "&" + "quot;";
+        return "&" + "#39;";
+      });
+    }
     function num(v) { const n = Number(String(v).replace(/\s/g, "").replace(",", ".")); return Number.isFinite(n) ? n : null; }
     function applies(item) {
       const s = state.settings;
@@ -403,7 +411,7 @@
     function closeSheet() { document.getElementById("modal").innerHTML = ""; }
     function formFields(entry) {
       const odo = currentKm();
-      return '<div class="split"><label>Дата<input id="f-date" type="date" value="' + esc(entry ? entry.date : today()) + '"></label><label>Пробег, км<input id="f-km" inputmode="numeric" value="' + esc(entry ? entry.km : (odo ?? "")) + '"></label><label>Сумма, ₽<input id="f-cost" inputmode="decimal" value="' + esc(entry && entry.cost != null ? entry.cost : "") + '"></label><label>Где делали<input id="f-shop" value="' + esc(entry ? entry.shop : "") + '"></label></div><label style="margin-top:.6rem">Заметка<textarea id="f-note">' + esc(entry ? entry.note : "") + "</textarea></label><p id="ferr" class="err"></p>";
+      return '<div class="split"><label>Дата<input id="f-date" type="date" value="' + esc(entry ? entry.date : today()) + '"></label><label>Пробег, км<input id="f-km" inputmode="numeric" value="' + esc(entry ? entry.km : (odo ?? "")) + '"></label><label>Сумма, ₽<input id="f-cost" inputmode="decimal" value="' + esc(entry && entry.cost != null ? entry.cost : "") + '"></label><label>Где делали<input id="f-shop" value="' + esc(entry ? entry.shop : "") + '"></label></div><label style="margin-top:.6rem">Заметка<textarea id="f-note">' + esc(entry ? entry.note : "") + '</textarea></label><p id="ferr" class="err"></p>';
     }
     function readCommon() {
       const date = document.getElementById("f-date").value;
